@@ -13,6 +13,6 @@ public class NewBehaviourScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        // This is a comment in the Update method
     }
 }
