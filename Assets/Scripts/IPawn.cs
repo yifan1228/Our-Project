@@ -16,4 +16,8 @@ public interface IPawn
     {
         return true;
     }
+    void UseAbility(int abilityIndex)
+    {
+        return;
+    }
 }

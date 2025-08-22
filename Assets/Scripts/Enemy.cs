@@ -36,9 +36,7 @@ public class Enemy : MonoBehaviour, IPawn, IEntity
     {
         Debug.Log($"{tag} has died.");
         rb.velocity = Vector2.zero; // 停止角色移动
-        GetComponent<CapsuleCollider2D>().enabled = false;
-        GetComponent<SpriteRenderer>().enabled = false; // 隐藏角色
-        Destroy(gameObject);
+        rb.constraints = RigidbodyConstraints2D.None;
     }
 
     // 实现接口IPawn
