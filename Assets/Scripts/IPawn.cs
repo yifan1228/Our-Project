@@ -12,7 +12,6 @@ public interface IPawn
     {
         return;
     }
-
     bool IsGrounded()
     {
         return true;

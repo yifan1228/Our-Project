@@ -42,10 +42,10 @@ public class Spike : MonoBehaviour, IBrick
         if (collision.gameObject.CompareTag("Enemy"))
         {
             Debug.Log("Enemy collided with Spike");
-            var player = collision.gameObject.GetComponent<IEntity>();
-            if (player != null)
+            var enemy = collision.gameObject.GetComponent<IEntity>();
+            if (enemy != null)
             {
-                player.Damaged(spikeDamage); // º‚¥Ã‘Ï≥……À∫¶
+                enemy.Damaged(spikeDamage); // º‚¥Ã‘Ï≥……À∫¶
             }
         }
     }
