@@ -21,6 +21,7 @@ public class PlayerCharacter : MonoBehaviour, IPawn, IEntity
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        anim = GetComponentInChildren<Animator>();
         health = maxHealth; // 初始化生命值
         tag = "Player"; // 设置标签为 Player
     }
@@ -40,6 +41,7 @@ public class PlayerCharacter : MonoBehaviour, IPawn, IEntity
         GetComponent<SpriteRenderer>().enabled = false; // 隐藏角色
         Destroy(gameObject);
     }
+
 
     //实现接口IPawn
     public void Jump()
