@@ -54,25 +54,25 @@ public class PlayerCharacter : MonoBehaviour, IPawn, IEntity
     private void Die()
     {
         Debug.Log($"{tag} has died.");
-        rb.velocity = Vector2.zero; // 鍋滄瑙掕壊绉诲姩
+        rb.velocity = Vector2.zero; // 停止角色移动
         GetComponent<CapsuleCollider2D>().enabled = false;
-        GetComponent<SpriteRenderer>().enabled = false; // 闅愯棌瑙掕壊
+        GetComponent<SpriteRenderer>().enabled = false; // 隐藏角色
         Destroy(gameObject);
     }
 
 
-    //瀹炵幇鎺ュ彛IPawn
+    //实现接口IPawn
     public void Jump()
     {
-        //璺宠穬
-        if (rb != null && isGrounded) // 妫�鏌ユ槸鍚﹀湪鍦伴潰涓?
+        //跳跃
+        if (rb != null && isGrounded) // 检查是否在地面上
         {
             rb.AddForce(new Vector2(0, jumpForce));
         }
     }
     public void Move(float direction)
     {
-        //绉诲姩
+        //移动
         Vector2 moveDirection = new Vector2(direction, 0);
         rb.velocity = new Vector2(moveDirection.x * moveSpeed, rb.velocity.y);
         if (direction < 0)
