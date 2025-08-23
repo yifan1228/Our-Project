@@ -6,8 +6,10 @@ using UnityEngine;
 public class DefaultBullet : MonoBehaviour, IEntity
 {
     Rigidbody2D rb;
+    float liftTimer = 0;
     [SerializeField] int damage = 10;
     [SerializeField] bool removeOnHit = true;
+    [SerializeField] float liftDuriation = 5;
     // Start is called before the first frame update
     void Start()
     {
@@ -18,12 +20,17 @@ public class DefaultBullet : MonoBehaviour, IEntity
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
+        liftTimer = 0;
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+        liftTimer += Time.deltaTime;
+        if (liftTimer > liftDuriation && liftDuriation > 0f)
+        {
+            Destroy(gameObject);
+        }
     }
 
     // 碰撞
@@ -43,5 +50,11 @@ public class DefaultBullet : MonoBehaviour, IEntity
                 }
             }
         }
+    }
+
+    // 实现接口IEntity
+    public GameObject GetGameObject()
+    {
+        return gameObject;
     }
 }

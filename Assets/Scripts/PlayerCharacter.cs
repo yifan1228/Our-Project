@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayerCharacter : MonoBehaviour, IPawn, IEntity
@@ -9,11 +10,12 @@ public class PlayerCharacter : MonoBehaviour, IPawn, IEntity
     int health;
     bool isGrounded;
     bool isTowardsLeft;
+    GameObject triggeringObject;
+    List<GameObject> abilityInstances;
     [SerializeField] float jumpForce = 300f; // 跳跃力度
     [SerializeField] float moveSpeed = 5f; // 移动速度
     [SerializeField] int maxHealth = 100; // 最大生命值
     [SerializeField] GameObject[] abilities; // 技能对象
-    GameObject[] abilityInstances;
 
     // Start is called before the first frame update
     void Start()
@@ -30,10 +32,10 @@ public class PlayerCharacter : MonoBehaviour, IPawn, IEntity
         // 实例化技能
         if (abilities != null)
         {
-            abilityInstances = new GameObject[abilities.Length];
+            abilityInstances = new List<GameObject>();
             for (int i = 0; i < abilities.Length; i++)
             {
-                abilityInstances[i] = Instantiate(abilities[i], transform);
+                abilityInstances.Add(Instantiate(abilities[i], transform));
             }
         }
         isTowardsLeft = false;
@@ -43,6 +45,27 @@ public class PlayerCharacter : MonoBehaviour, IPawn, IEntity
     void Update()
     {
         isGrounded = Mathf.Abs(rb.velocity.y) < 0.01f;
+    }
+
+    // 触发
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.gameObject.CompareTag(tag))
+        {
+            return;
+        }
+        if (collision.gameObject.GetComponent<IEntity>() == null)
+        {
+            return;
+        }
+        triggeringObject = collision.gameObject;
+    }
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        if (collision.gameObject == triggeringObject)
+        {
+            triggeringObject = null;
+        }
     }
 
     //内部逻辑
@@ -84,7 +107,7 @@ public class PlayerCharacter : MonoBehaviour, IPawn, IEntity
     }
     public void UseAbility(int abilityIndex)
     {
-        if (abilityInstances != null && abilityIndex >= 0 && abilityIndex < abilityInstances.Length)
+        if (abilityInstances != null && abilityIndex >= 0 && abilityIndex < abilityInstances.Count)
         {
             abilityInstances[abilityIndex].GetComponent<IAbility>()?.Activate(GetComponent<IEntity>());
         }
@@ -125,5 +148,13 @@ public class PlayerCharacter : MonoBehaviour, IPawn, IEntity
     public bool IsTowardsLeft()
     {
         return isTowardsLeft;
+    }
+    public GameObject TriggeringObject()
+    {
+        return triggeringObject;
+    }
+    public void AddAbility(GameObject ability)
+    {
+        abilityInstances.Add(Instantiate(ability, transform));
     }
 }

@@ -24,12 +24,21 @@ public interface IEntity
     {
         return false;
     }
-    GameObject GetGameObject()
-    {
-        return null;
-    }
+    GameObject GetGameObject();
     bool IsTowardsLeft()
     {
         return false;
+    }
+    GameObject TriggeringObject()
+    {
+        return null;
+    }
+    GameObject[] GetAbilities()
+    {
+        return null;
+    }
+    void AddAbility(GameObject ability)
+    {
+        return;
     }
 }

@@ -8,7 +8,7 @@ public class Shoot : MonoBehaviour, IAbility
     [SerializeField] Vector3 bias;
     [SerializeField] Vector2 shootForce;
     [SerializeField] float cooldownThreshold;
-    public float cooldownTimer = 0f;
+    float cooldownTimer = 0f;
     // Start is called before the first frame update
     void Start()
     {
@@ -30,7 +30,6 @@ public class Shoot : MonoBehaviour, IAbility
     // 实现接口IAbility
     public void Activate(IEntity speller)
     {
-        Debug.Log("Try activate");
         if (cooldownTimer < cooldownThreshold)
         {
             Debug.LogError("Waiting for cooldown:" + cooldownTimer + "<" + cooldownThreshold);
