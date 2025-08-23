@@ -6,9 +6,11 @@ using UnityEngine;
 public class PlayerCharacter : MonoBehaviour, IPawn, IEntity
 {
     Rigidbody2D rb;
+    Animator anim;
     int health;
     bool isGrounded;
     bool isTowardsLeft;
+    int faceDir = 1; //面朝方向：1为右；-1为左
     [SerializeField] float jumpForce = 300f; // 跳跃力度
     [SerializeField] float moveSpeed = 5f; // 移动速度
     [SerializeField] int maxHealth = 100; // 最大生命值
@@ -44,6 +46,35 @@ public class PlayerCharacter : MonoBehaviour, IPawn, IEntity
     void Update()
     {
         isGrounded = Mathf.Abs(rb.velocity.y) < 0.01f;
+
+        AnimationController();
+        FlipController();
+    }
+
+    //动画控制器
+    private void AnimationController()
+    {
+        bool isMoving = rb.velocity.x != 0;
+
+        anim.SetFloat("yVelocity", rb.velocity.y);
+
+        anim.SetBool("isMoving", isMoving);
+        anim.SetBool("isGrounded", isGrounded);
+    }
+
+    //翻转控制
+    private void FlipController()
+    {
+        if (rb.velocity.x > 0 && faceDir == -1)
+        {
+            faceDir = faceDir * -1;
+            transform.localScale = new Vector3(1,1,1);
+        }
+        else if (rb.velocity.x < 0 && faceDir == 1)
+        {
+            faceDir = faceDir * -1;
+            transform.localScale = new Vector3(-1, 1, 1);
+        }
     }
 
     //内部逻辑
