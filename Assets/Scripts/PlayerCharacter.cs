@@ -7,15 +7,16 @@ using UnityEngine;
 public class PlayerCharacter : MonoBehaviour, IPawn, IEntity
 {
     Rigidbody2D rb;
+    Animator anim;
     int health;
     bool isGrounded;
     bool isTowardsLeft;
     GameObject triggeringObject;
     List<GameObject> abilityInstances;
-    [SerializeField] float jumpForce = 300f; // ÌøÔ¾Á¦¶È
-    [SerializeField] float moveSpeed = 5f; // ÒÆ¶¯ËÙ¶È
-    [SerializeField] int maxHealth = 100; // ×î´óÉúÃüÖµ
-    [SerializeField] GameObject[] abilities; // ¼¼ÄÜ¶ÔÏó
+    [SerializeField] float jumpForce = 300f; // è·³è·ƒåŠ›åº¦
+    [SerializeField] float moveSpeed = 5f; // ç§»åŠ¨é€Ÿåº¦
+    [SerializeField] int maxHealth = 100; // æœ€å¤§ç”Ÿå‘½å€¼
+    [SerializeField] GameObject[] abilities; // æŠ€èƒ½å¯¹è±¡
 
     // Start is called before the first frame update
     void Start()
@@ -27,9 +28,10 @@ public class PlayerCharacter : MonoBehaviour, IPawn, IEntity
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
-        health = maxHealth; // ³õÊ¼»¯ÉúÃüÖµ
-        tag = "Player"; // ÉèÖÃ±êÇ©Îª Player
-        // ÊµÀı»¯¼¼ÄÜ
+        anim = GetComponentInChildren<Animator>();
+        health = maxHealth; // åˆå§‹åŒ–ç”Ÿå‘½å€¼
+        tag = "Player"; // è®¾ç½®æ ‡ç­¾ä¸º Player
+        // å®ä¾‹åŒ–æŠ€èƒ½
         if (abilities != null)
         {
             abilityInstances = new List<GameObject>();
@@ -45,9 +47,38 @@ public class PlayerCharacter : MonoBehaviour, IPawn, IEntity
     void Update()
     {
         isGrounded = Mathf.Abs(rb.velocity.y) < 0.01f;
+
+        AnimationController();
+        FlipController();
     }
 
-    // ´¥·¢
+    //åŠ¨ç”»æ§åˆ¶å™¨
+    private void AnimationController()
+    {
+        bool isMoving = rb.velocity.x != 0;
+
+        anim.SetFloat("yVelocity", rb.velocity.y);
+
+        anim.SetBool("isMoving", isMoving);
+        anim.SetBool("isGrounded", isGrounded);
+    }
+
+    //ç¿»è½¬æ§åˆ¶
+    private void FlipController()
+    {
+        if (rb.velocity.x > 0 && faceDir == -1)
+        {
+            faceDir = faceDir * -1;
+            transform.localScale = new Vector3(1,1,1);
+        }
+        else if (rb.velocity.x < 0 && faceDir == 1)
+        {
+            faceDir = faceDir * -1;
+            transform.localScale = new Vector3(-1, 1, 1);
+        }
+    }
+
+    // è§¦å‘
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.gameObject.CompareTag(tag))
@@ -68,28 +99,29 @@ public class PlayerCharacter : MonoBehaviour, IPawn, IEntity
         }
     }
 
-    //ÄÚ²¿Âß¼­
+    //å†…éƒ¨é€»è¾‘
     private void Die()
     {
         Debug.Log($"{tag} has died.");
-        rb.velocity = Vector2.zero; // Í£Ö¹½ÇÉ«ÒÆ¶¯
+        rb.velocity = Vector2.zero; // åœæ­¢è§’è‰²ç§»åŠ¨
         GetComponent<CapsuleCollider2D>().enabled = false;
-        GetComponent<SpriteRenderer>().enabled = false; // Òş²Ø½ÇÉ«
+        GetComponent<SpriteRenderer>().enabled = false; // éšè—è§’è‰²
         Destroy(gameObject);
     }
 
-    //ÊµÏÖ½Ó¿ÚIPawn
+
+    //å®ç°æ¥å£IPawn
     public void Jump()
     {
-        //ÌøÔ¾
-        if (rb != null && isGrounded) // ¼ì²éÊÇ·ñÔÚµØÃæÉÏ
+        //è·³è·ƒ
+        if (rb != null && isGrounded) // æ£€æŸ¥æ˜¯å¦åœ¨åœ°é¢ä¸Š
         {
             rb.AddForce(new Vector2(0, jumpForce));
         }
     }
     public void Move(float direction)
     {
-        //ÒÆ¶¯
+        //ç§»åŠ¨
         Vector2 moveDirection = new Vector2(direction, 0);
         rb.velocity = new Vector2(moveDirection.x * moveSpeed, rb.velocity.y);
         if (direction < 0)
@@ -113,7 +145,7 @@ public class PlayerCharacter : MonoBehaviour, IPawn, IEntity
         }
     }
 
-    //ÊµÏÖ½Ó¿ÚIEntity
+    //å®ç°æ¥å£IEntity
     public int GetHealth()
     {
         return health;
@@ -137,7 +169,7 @@ public class PlayerCharacter : MonoBehaviour, IPawn, IEntity
         Debug.Log($"{tag} took {damage} damage, current health: {health}");
         if (health == 0)
         {
-            // ´¦Àí½ÇÉ«ËÀÍöÂß¼­
+            // å¤„ç†è§’è‰²æ­»äº¡é€»è¾‘
             Die();
         }
     }
