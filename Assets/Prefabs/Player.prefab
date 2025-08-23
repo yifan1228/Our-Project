@@ -167,6 +167,7 @@ MonoBehaviour:
   jumpForce: 1000
   moveSpeed: 5
   maxHealth: 100
+  abilities: []
 --- !u!114 &2235206814555357321
 MonoBehaviour:
   m_ObjectHideFlags: 0

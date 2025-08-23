@@ -12,6 +12,7 @@ public class Enemy : MonoBehaviour, IPawn, IEntity
     [SerializeField] float jumpForce = 300f; // 跳跃力度
     [SerializeField] float moveSpeed = 5f; // 移动速度
     [SerializeField] int maxHealth = 100; // 最大生命值
+    [SerializeField] GameObject[] abilities; // 技能对象
 
     // Awake is called when the script instance is being loaded
     void Awake()
@@ -32,7 +33,11 @@ public class Enemy : MonoBehaviour, IPawn, IEntity
     // Update is called once per frame
     void Update()
     {
-        
+        if (health <= 0)
+        {
+            // 处理角色死亡逻辑
+            Die();
+        }
     }
 
     // 碰撞
@@ -82,7 +87,7 @@ public class Enemy : MonoBehaviour, IPawn, IEntity
         health -= damage;
         if (health < 0) health = 0;
         Debug.Log($"{tag} took {damage} damage, current health: {health}");
-        if (health == 0)
+        if (health <= 0)
         {
             // 处理角色死亡逻辑
             Die();
@@ -91,5 +96,13 @@ public class Enemy : MonoBehaviour, IPawn, IEntity
     public bool IsDead()
     {
         return health <= 0;
+    }
+    public GameObject GetGameObject()
+    {
+        return gameObject;
+    }
+    public GameObject[] GetAbilities()
+    {
+        return abilities;
     }
 }

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayerCharacter : MonoBehaviour, IPawn, IEntity
@@ -10,12 +11,12 @@ public class PlayerCharacter : MonoBehaviour, IPawn, IEntity
     int health;
     bool isGrounded;
     bool isTowardsLeft;
-    int faceDir = 1; //Ãæ³¯·½Ïò£º1ÎªÓÒ£»-1Îª×ó
-    [SerializeField] float jumpForce = 300f; // ÌøÔ¾Á¦¶È
-    [SerializeField] float moveSpeed = 5f; // ÒÆ¶¯ËÙ¶È
-    [SerializeField] int maxHealth = 100; // ×î´óÉúÃüÖµ
-    [SerializeField] GameObject[] abilities; // ¼¼ÄÜ¶ÔÏó
-    GameObject[] abilityInstances;
+    GameObject triggeringObject;
+    List<GameObject> abilityInstances;
+    [SerializeField] float jumpForce = 300f; // è·³è·ƒåŠ›åº¦
+    [SerializeField] float moveSpeed = 5f; // ç§»åŠ¨é€Ÿåº¦
+    [SerializeField] int maxHealth = 100; // æœ€å¤§ç”Ÿå‘½å€¼
+    [SerializeField] GameObject[] abilities; // æŠ€èƒ½å¯¹è±¡
 
     // Start is called before the first frame update
     void Start()
@@ -28,15 +29,15 @@ public class PlayerCharacter : MonoBehaviour, IPawn, IEntity
     {
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponentInChildren<Animator>();
-        health = maxHealth; // ³õÊ¼»¯ÉúÃüÖµ
-        tag = "Player"; // ÉèÖÃ±êÇ©Îª Player
-        // ÊµÀı»¯¼¼ÄÜ
+        health = maxHealth; // åˆå§‹åŒ–ç”Ÿå‘½å€¼
+        tag = "Player"; // è®¾ç½®æ ‡ç­¾ä¸º Player
+        // å®ä¾‹åŒ–æŠ€èƒ½
         if (abilities != null)
         {
-            abilityInstances = new GameObject[abilities.Length];
+            abilityInstances = new List<GameObject>();
             for (int i = 0; i < abilities.Length; i++)
             {
-                abilityInstances[i] = Instantiate(abilities[i], transform);
+                abilityInstances.Add(Instantiate(abilities[i], transform));
             }
         }
         isTowardsLeft = false;
@@ -51,7 +52,7 @@ public class PlayerCharacter : MonoBehaviour, IPawn, IEntity
         FlipController();
     }
 
-    //¶¯»­¿ØÖÆÆ÷
+    //åŠ¨ç”»æ§åˆ¶å™¨
     private void AnimationController()
     {
         bool isMoving = rb.velocity.x != 0;
@@ -62,7 +63,7 @@ public class PlayerCharacter : MonoBehaviour, IPawn, IEntity
         anim.SetBool("isGrounded", isGrounded);
     }
 
-    //·­×ª¿ØÖÆ
+    //ç¿»è½¬æ§åˆ¶
     private void FlipController()
     {
         if (rb.velocity.x > 0 && faceDir == -1)
@@ -77,29 +78,50 @@ public class PlayerCharacter : MonoBehaviour, IPawn, IEntity
         }
     }
 
-    //ÄÚ²¿Âß¼­
+    // è§¦å‘
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.gameObject.CompareTag(tag))
+        {
+            return;
+        }
+        if (collision.gameObject.GetComponent<IEntity>() == null)
+        {
+            return;
+        }
+        triggeringObject = collision.gameObject;
+    }
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        if (collision.gameObject == triggeringObject)
+        {
+            triggeringObject = null;
+        }
+    }
+
+    //å†…éƒ¨é€»è¾‘
     private void Die()
     {
         Debug.Log($"{tag} has died.");
-        rb.velocity = Vector2.zero; // Í£Ö¹½ÇÉ«ÒÆ¶¯
+        rb.velocity = Vector2.zero; // åœæ­¢è§’è‰²ç§»åŠ¨
         GetComponent<CapsuleCollider2D>().enabled = false;
-        GetComponent<SpriteRenderer>().enabled = false; // Òş²Ø½ÇÉ«
+        GetComponent<SpriteRenderer>().enabled = false; // éšè—è§’è‰²
         Destroy(gameObject);
     }
 
 
-    //ÊµÏÖ½Ó¿ÚIPawn
+    //å®ç°æ¥å£IPawn
     public void Jump()
     {
-        //ÌøÔ¾
-        if (rb != null && isGrounded) // ¼ì²éÊÇ·ñÔÚµØÃæÉÏ
+        //è·³è·ƒ
+        if (rb != null && isGrounded) // æ£€æŸ¥æ˜¯å¦åœ¨åœ°é¢ä¸Š
         {
             rb.AddForce(new Vector2(0, jumpForce));
         }
     }
     public void Move(float direction)
     {
-        //ÒÆ¶¯
+        //ç§»åŠ¨
         Vector2 moveDirection = new Vector2(direction, 0);
         rb.velocity = new Vector2(moveDirection.x * moveSpeed, rb.velocity.y);
         if (direction < 0)
@@ -117,13 +139,13 @@ public class PlayerCharacter : MonoBehaviour, IPawn, IEntity
     }
     public void UseAbility(int abilityIndex)
     {
-        if (abilityInstances != null && abilityIndex >= 0 && abilityIndex < abilityInstances.Length)
+        if (abilityInstances != null && abilityIndex >= 0 && abilityIndex < abilityInstances.Count)
         {
             abilityInstances[abilityIndex].GetComponent<IAbility>()?.Activate(GetComponent<IEntity>());
         }
     }
 
-    //ÊµÏÖ½Ó¿ÚIEntity
+    //å®ç°æ¥å£IEntity
     public int GetHealth()
     {
         return health;
@@ -147,7 +169,7 @@ public class PlayerCharacter : MonoBehaviour, IPawn, IEntity
         Debug.Log($"{tag} took {damage} damage, current health: {health}");
         if (health == 0)
         {
-            // ´¦Àí½ÇÉ«ËÀÍöÂß¼­
+            // å¤„ç†è§’è‰²æ­»äº¡é€»è¾‘
             Die();
         }
     }
@@ -158,5 +180,13 @@ public class PlayerCharacter : MonoBehaviour, IPawn, IEntity
     public bool IsTowardsLeft()
     {
         return isTowardsLeft;
+    }
+    public GameObject TriggeringObject()
+    {
+        return triggeringObject;
+    }
+    public void AddAbility(GameObject ability)
+    {
+        abilityInstances.Add(Instantiate(ability, transform));
     }
 }
