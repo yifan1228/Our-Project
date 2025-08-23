@@ -24,4 +24,12 @@ public interface IEntity
     {
         return false;
     }
+    GameObject GetGameObject()
+    {
+        return null;
+    }
+    bool IsTowardsLeft()
+    {
+        return false;
+    }
 }

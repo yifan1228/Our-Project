@@ -16,8 +16,8 @@ public class SpawnFlag : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        // 检测按下H键
-        if (Input.GetKeyDown(KeyCode.H))
+        // 检测按下P键
+        if (Input.GetKeyDown(KeyCode.P))
         {
             Spawn();
         }
