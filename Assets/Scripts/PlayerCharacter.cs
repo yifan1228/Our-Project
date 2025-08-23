@@ -11,6 +11,7 @@ public class PlayerCharacter : MonoBehaviour, IPawn, IEntity
     bool isGrounded;
     bool isTowardsLeft;
     GameObject triggeringObject;
+    public GameObject wall;
     List<GameObject> abilityInstances;
     [SerializeField] float jumpForce = 300f; // 跳跃力度
     [SerializeField] float moveSpeed = 5f; // 移动速度
@@ -22,8 +23,6 @@ public class PlayerCharacter : MonoBehaviour, IPawn, IEntity
     {
 
     }
-
-    // ...
 
     void Awake()
     {
@@ -43,10 +42,64 @@ public class PlayerCharacter : MonoBehaviour, IPawn, IEntity
         isTowardsLeft = false;
     }
 
+    //碰撞
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.layer == 3)
+        {
+            // 处理与墙体的碰撞逻辑
+            var contacts = new ContactPoint2D[collision.contactCount];
+            collision.GetContacts(contacts);
+            foreach (var contact in contacts)
+            {
+                if (Mathf.Abs(contact.normal.y) < 0.1f)
+                {
+                    wall = collision.gameObject;
+                    break;
+                }
+
+            }
+        }
+        
+        // 处理与其他物体的碰撞逻辑
+        var contactPoints = new ContactPoint2D[collision.contactCount];
+        collision.GetContacts(contactPoints);
+        foreach (var contact in contactPoints)
+        {
+            if (contact.normal.x < 0.2f)
+            {
+                isGrounded = true;
+            }
+        }
+    }
+    private void OnCollisionExit2D(Collision2D collision)
+    {
+        if (collision.gameObject == wall)
+        {
+            wall = null;
+        }
+    }
+
+    // 触发
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (!collision.gameObject.CompareTag(tag))
+        {
+            triggeringObject = collision.gameObject;
+        }
+    }
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        if (triggeringObject == collision.gameObject)
+        {
+            triggeringObject = null;
+        }
+    }
+
     // Update is called once per frame
     void Update()
     {
-        isGrounded = Mathf.Abs(rb.velocity.y) < 0.01f;
+        //isGrounded = Mathf.Abs(rb.velocity.y) < 0.01f;
     }
 
 
@@ -59,21 +112,38 @@ public class PlayerCharacter : MonoBehaviour, IPawn, IEntity
         GetComponent<SpriteRenderer>().enabled = false; // 隐藏角色
         Destroy(gameObject);
     }
-
+    private void Clamber()
+    {
+        rb.velocity = new Vector2(0f, moveSpeed * 0.45f);
+    }
 
     //实现接口IPawn
     public void Jump()
     {
-        //跳跃
+        if (rb != null && IsOnTheWall())
+        {
+            Clamber();
+
+            return;// 贴墙时不进行正常跳跃
+        }
+        //跳跃（不贴墙）
         if (rb != null && isGrounded) // 检查是否在地面上
         {
             rb.AddForce(new Vector2(0, jumpForce));
+            isGrounded = false;
         }
     }
     public void Move(float direction)
     {
-        //移动
         Vector2 moveDirection = new Vector2(direction, 0);
+        // 贴墙
+        if (rb != null && IsOnTheWall())
+        {
+            rb.AddForce(moveDirection * 10f);
+
+            return;// 贴墙时不进行正常移动
+        }
+        // 移动（不贴墙）
         rb.velocity = new Vector2(moveDirection.x * moveSpeed, rb.velocity.y);
         if (direction < 0)
         {
@@ -95,8 +165,12 @@ public class PlayerCharacter : MonoBehaviour, IPawn, IEntity
             abilityInstances[abilityIndex].GetComponent<IAbility>()?.Activate(GetComponent<IEntity>());
         }
     }
+    public bool IsOnTheWall()
+    {
+        return wall != null;
+    }
 
-    //瀹炵幇鎺ュ彛IEntity
+    // 实现接口IEntity
     public int GetHealth()
     {
         return health;
@@ -120,7 +194,7 @@ public class PlayerCharacter : MonoBehaviour, IPawn, IEntity
         Debug.Log($"{tag} took {damage} damage, current health: {health}");
         if (health == 0)
         {
-            // 澶勭悊瑙掕壊姝讳骸閫昏緫
+            // 处理角色死亡流程
             Die();
         }
     }
@@ -131,5 +205,18 @@ public class PlayerCharacter : MonoBehaviour, IPawn, IEntity
     public bool IsTowardsLeft()
     {
         return isTowardsLeft;
+    }
+    public GameObject TriggeringObject()
+    {
+        return triggeringObject;
+    }
+    public void AddAbility(GameObject ability)
+    {
+        abilityInstances ??= new List<GameObject>();
+        abilityInstances.Add(Instantiate(ability, transform));
+    }
+    public bool IsCreature()
+    {
+        return true;
     }
 }

@@ -33,11 +33,7 @@ public class Enemy : MonoBehaviour, IPawn, IEntity
     // Update is called once per frame
     void Update()
     {
-        if (health <= 0)
-        {
-            // ´¦Àí½ÇÉ«ËÀÍöÂß¼­
-            Die();
-        }
+        
     }
 
     // Åö×²
@@ -69,6 +65,10 @@ public class Enemy : MonoBehaviour, IPawn, IEntity
     // ÄÚ²¿Âß¼­
     private void Die()
     {
+        if (rb == null)
+        {
+            return;
+        }
         Debug.Log($"{tag} has died.");
         rb.velocity = Vector2.zero; // Í£Ö¹½ÇÉ«ÒÆ¶¯
         rb.constraints = RigidbodyConstraints2D.None;
@@ -104,5 +104,9 @@ public class Enemy : MonoBehaviour, IPawn, IEntity
     public GameObject[] GetAbilities()
     {
         return abilities;
+    }
+    public bool IsCreature()
+    {
+        return true;
     }
 }

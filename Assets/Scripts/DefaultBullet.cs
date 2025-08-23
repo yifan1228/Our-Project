@@ -57,4 +57,8 @@ public class DefaultBullet : MonoBehaviour, IEntity
     {
         return gameObject;
     }
+    public bool IsCreature()
+    {
+        return false;
+    }
 }

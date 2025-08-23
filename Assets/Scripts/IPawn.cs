@@ -20,4 +20,8 @@ public interface IPawn
     {
         return;
     }
+    bool IsOnTheWall()
+    {
+        return false;
+    }
 }

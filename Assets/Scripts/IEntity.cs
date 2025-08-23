@@ -41,4 +41,12 @@ public interface IEntity
     {
         return;
     }
+    GameObject GetWallAttached()
+    {
+        return null;
+    }
+    bool IsCreature()
+    {
+        return false;
+    }
 }

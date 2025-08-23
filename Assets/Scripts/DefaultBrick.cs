@@ -30,12 +30,12 @@ public class DefaultBrick : MonoBehaviour, IBrick
         if (collision.gameObject.CompareTag("Player"))
         {
             // 处理与玩家的碰撞逻辑
-            Debug.Log("Player collided with DefaultBrick");
+            
         }
         if (collision.gameObject.CompareTag("Enemy"))
         {
-            // 处理与玩家的碰撞逻辑
-            Debug.Log("Player collided with DefaultBrick");
+            // 处理与敌人的碰撞逻辑
+            
         }
     }
 

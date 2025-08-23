@@ -21,7 +21,7 @@ public class PlayerController : MonoBehaviour
     void Update()
     {
         //ÌøÔ¾
-        if (Input.GetButtonDown("Jump"))
+        if (Input.GetButton("Jump"))
         {
             character.Jump();
         }
