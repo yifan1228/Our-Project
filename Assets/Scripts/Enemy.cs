@@ -7,6 +7,8 @@ public class Enemy : MonoBehaviour, IPawn, IEntity
     Rigidbody2D rb;
     int health;
     bool isGrounded;
+    CapsuleCollider2D bd;
+    BoxCollider2D tg;
     [SerializeField] float jumpForce = 300f; // 跳跃力度
     [SerializeField] float moveSpeed = 5f; // 移动速度
     [SerializeField] int maxHealth = 100; // 最大生命值
@@ -14,6 +16,8 @@ public class Enemy : MonoBehaviour, IPawn, IEntity
     // Awake is called when the script instance is being loaded
     void Awake()
     {
+        tg = GetComponent<BoxCollider2D>();
+        bd = GetComponent<CapsuleCollider2D>();
         rb = GetComponent<Rigidbody2D>();
         health = maxHealth; // 初始化生命值
         tag = "Enemy"; // 设置标签为 Enemy
@@ -29,6 +33,32 @@ public class Enemy : MonoBehaviour, IPawn, IEntity
     void Update()
     {
         
+    }
+
+    // 碰撞
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Player"))
+        {
+            var player = collision.gameObject.GetComponent<IEntity>();
+            if ((player != null) && GetComponent<IEntity>().IsDead())
+            {
+                Physics2D.IgnoreCollision(bd, collision.collider);
+            }
+        }
+    }
+
+    // 触发
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.gameObject.CompareTag("Player"))
+        {
+            var player = collision.gameObject.GetComponent<IEntity>();
+            if (player != null)
+            {
+                Debug.Log("Enemy triggered by Player");
+            }
+        }
     }
 
     // 内部逻辑
@@ -57,5 +87,9 @@ public class Enemy : MonoBehaviour, IPawn, IEntity
             // 处理角色死亡逻辑
             Die();
         }
+    }
+    public bool IsDead()
+    {
+        return health <= 0;
     }
 }

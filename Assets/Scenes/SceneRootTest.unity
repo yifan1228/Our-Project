@@ -352,6 +352,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: Level
       objectReference: {fileID: 0}
+    - target: {fileID: 3348504244710053549, guid: 68d796ec2d8acfb4c9ac63e73ab8a9d1, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 5856850358356851141, guid: 68d796ec2d8acfb4c9ac63e73ab8a9d1, type: 3}
+      propertyPath: direction
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 8298438289110987055, guid: 68d796ec2d8acfb4c9ac63e73ab8a9d1, type: 3}
       propertyPath: m_RootOrder
       value: 0
