@@ -11,7 +11,6 @@ public class PlayerCharacter : MonoBehaviour, IPawn, IEntity
     bool isGrounded;
     bool isTowardsLeft;
     GameObject triggeringObject;
-    // 将 abilityInstances 的声明和初始化从 GameObject[] 改为 List<GameObject>
     List<GameObject> abilityInstances;
     [SerializeField] float jumpForce = 300f; // 跳跃力度
     [SerializeField] float moveSpeed = 5f; // 移动速度
