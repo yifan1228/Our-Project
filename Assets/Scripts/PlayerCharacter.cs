@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayerCharacter : MonoBehaviour, IPawn, IEntity
@@ -12,11 +11,12 @@ public class PlayerCharacter : MonoBehaviour, IPawn, IEntity
     bool isGrounded;
     bool isTowardsLeft;
     GameObject triggeringObject;
+    // ½« abilityInstances µÄÉùÃ÷ºÍ³õÊ¼»¯´Ó GameObject[] ¸ÄÎª List<GameObject>
     List<GameObject> abilityInstances;
-    [SerializeField] float jumpForce = 300f; // è·³è·ƒåŠ›åº¦
-    [SerializeField] float moveSpeed = 5f; // ç§»åŠ¨é€Ÿåº¦
-    [SerializeField] int maxHealth = 100; // æœ€å¤§ç”Ÿå‘½å€¼
-    [SerializeField] GameObject[] abilities; // æŠ€èƒ½å¯¹è±¡
+    [SerializeField] float jumpForce = 300f; // ÌøÔ¾Á¦¶È
+    [SerializeField] float moveSpeed = 5f; // ÒÆ¶¯ËÙ¶È
+    [SerializeField] int maxHealth = 100; // ×î´óÉúÃüÖµ
+    [SerializeField] GameObject[] abilities; // ¼¼ÄÜ¶ÔÏó
 
     // Start is called before the first frame update
     void Start()
@@ -24,14 +24,15 @@ public class PlayerCharacter : MonoBehaviour, IPawn, IEntity
 
     }
 
-    // Awake is called when the script instance is being loaded
+    // ...
+
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
         anim = GetComponentInChildren<Animator>();
-        health = maxHealth; // åˆå§‹åŒ–ç”Ÿå‘½å€¼
-        tag = "Player"; // è®¾ç½®æ ‡ç­¾ä¸º Player
-        // å®ä¾‹åŒ–æŠ€èƒ½
+        health = maxHealth;
+        tag = "Player";
+        // ÊµÀı»¯¼¼ÄÜ
         if (abilities != null)
         {
             abilityInstances = new List<GameObject>();
@@ -47,59 +48,10 @@ public class PlayerCharacter : MonoBehaviour, IPawn, IEntity
     void Update()
     {
         isGrounded = Mathf.Abs(rb.velocity.y) < 0.01f;
-
-        AnimationController();
-        FlipController();
     }
 
-    //åŠ¨ç”»æ§åˆ¶å™¨
-    private void AnimationController()
-    {
-        bool isMoving = rb.velocity.x != 0;
 
-        anim.SetFloat("yVelocity", rb.velocity.y);
-
-        anim.SetBool("isMoving", isMoving);
-        anim.SetBool("isGrounded", isGrounded);
-    }
-
-    //ç¿»è½¬æ§åˆ¶
-    private void FlipController()
-    {
-        if (rb.velocity.x > 0 && faceDir == -1)
-        {
-            faceDir = faceDir * -1;
-            transform.localScale = new Vector3(1,1,1);
-        }
-        else if (rb.velocity.x < 0 && faceDir == 1)
-        {
-            faceDir = faceDir * -1;
-            transform.localScale = new Vector3(-1, 1, 1);
-        }
-    }
-
-    // è§¦å‘
-    private void OnTriggerEnter2D(Collider2D collision)
-    {
-        if (collision.gameObject.CompareTag(tag))
-        {
-            return;
-        }
-        if (collision.gameObject.GetComponent<IEntity>() == null)
-        {
-            return;
-        }
-        triggeringObject = collision.gameObject;
-    }
-    private void OnTriggerExit2D(Collider2D collision)
-    {
-        if (collision.gameObject == triggeringObject)
-        {
-            triggeringObject = null;
-        }
-    }
-
-    //å†…éƒ¨é€»è¾‘
+    //ÄÚ²¿Âß¼­
     private void Die()
     {
         Debug.Log($"{tag} has died.");
@@ -114,7 +66,7 @@ public class PlayerCharacter : MonoBehaviour, IPawn, IEntity
     public void Jump()
     {
         //è·³è·ƒ
-        if (rb != null && isGrounded) // æ£€æŸ¥æ˜¯å¦åœ¨åœ°é¢ä¸Š
+        if (rb != null && isGrounded) // æ£€æŸ¥æ˜¯å¦åœ¨åœ°é¢ä¸?
         {
             rb.AddForce(new Vector2(0, jumpForce));
         }
@@ -180,13 +132,5 @@ public class PlayerCharacter : MonoBehaviour, IPawn, IEntity
     public bool IsTowardsLeft()
     {
         return isTowardsLeft;
-    }
-    public GameObject TriggeringObject()
-    {
-        return triggeringObject;
-    }
-    public void AddAbility(GameObject ability)
-    {
-        abilityInstances.Add(Instantiate(ability, transform));
     }
 }
